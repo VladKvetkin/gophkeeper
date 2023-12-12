@@ -1,4 +1,3 @@
 {
-  "address": "localhost:3333",
-  "log_level": "info"
+  "address": "localhost:3333"
 }

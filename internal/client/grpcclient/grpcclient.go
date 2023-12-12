@@ -4,23 +4,26 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/VladKvetkin/gophkeeper/internal/client/config"
-	pb "github.com/VladKvetkin/gophkeeper/pkg/grpc/gophkeeper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/VladKvetkin/gophkeeper/internal/client/config"
+	"github.com/VladKvetkin/gophkeeper/internal/client/interceptors"
+
+	pb "github.com/VladKvetkin/gophkeeper/pkg/grpc/gophkeeper"
 )
 
-// GRPCClient – Объект gRPC клиента для общения с сервером
-type GRPCClient struct {
+// Client – Объект gRPC клиента для общения с сервером.
+type Client struct {
 	gRPCClient pb.GophKeeperClient
 	config     *config.Config
 	authToken  string
 	timeout    time.Duration
 }
 
-// NewGRPCClient – конструктор GRPC клиента
-func NewGRPCClient(c *config.Config) (*GRPCClient, error) {
-	client := &GRPCClient{
+// NewGRPCClient – функция инициализации gRPC клиента.
+func NewGRPCClient(c *config.Config) (*Client, error) {
+	client := &Client{
 		config:  c,
 		timeout: time.Duration(10) * time.Second,
 	}
@@ -28,6 +31,7 @@ func NewGRPCClient(c *config.Config) (*GRPCClient, error) {
 	conn, err := grpc.Dial(
 		c.Address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(interceptors.AuthInterceptor(client)),
 	)
 
 	if err != nil {
@@ -41,6 +45,6 @@ func NewGRPCClient(c *config.Config) (*GRPCClient, error) {
 }
 
 // GetAuthToken – метод получения AuthToken пользователя.
-func (c *GRPCClient) GetAuthToken() string {
+func (c *Client) GetAuthToken() string {
 	return c.authToken
 }

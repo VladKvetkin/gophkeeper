@@ -1,8 +1,0 @@
-package client
-
-const (
-	GET_USER_DATA_TEXT = iota + 1
-	GET_USER_DATA_BINARY
-	SAVE_USER_DATA
-	EDIT_USER_DATA
-)
